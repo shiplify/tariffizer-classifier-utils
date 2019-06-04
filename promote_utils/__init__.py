@@ -38,3 +38,7 @@ def run(bucket):
   logger.log('Promoting model from staging to production.')
   du.promote_model('current.staging.txt', 'current.production.txt')
 
+  # Log result
+  logger.log("Finished promoting.")
+  logger.flush()
+

@@ -47,6 +47,6 @@ def run(bucket, model_version_to_push=None):
   du.point_stage_file_to_model_version(stage_file, model_version_to_push)
 
   # Log result
-  logger.log("Finished pushing")
+  logger.log("Finished pushing.")
   logger.flush()
 
