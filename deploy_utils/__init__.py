@@ -14,12 +14,12 @@ class DeployUtil(object):
   def model_version_for_stage_file(self, stage_file_name):
     key_obj = Key(self.bucket)
     key_obj.key = stage_file_name
-    return key_obj.get_contents_as_string().strip()
+    return key_obj.get_contents_as_string(encoding='utf-8').strip()
 
   def sha_for_model_version(self, model_version):
     key_obj = Key(self.bucket)
-    key_obj.key = model_version + '/sha.txt'
-    return key_obj.get_contents_as_string()
+    key_obj.key = "{}/sha.txt".format(model_version)
+    return key_obj.get_contents_as_string(encoding='utf-8')
 
   def file_exists_at_key(self, key):
     key_obj = Key(self.bucket)
@@ -46,7 +46,7 @@ class DeployUtil(object):
     # Get file contents
     key_obj = Key(self.bucket)
     key_obj.key = remote_key
-    return key_obj.get_contents_as_string()
+    return key_obj.get_contents_as_string(encoding='utf-8')
 
   def mkdir_p(self, path):
     try:
@@ -86,14 +86,14 @@ class DeployUtil(object):
     key_obj.set_contents_from_string(model_version)
 
   def model_version_exists(self, model_version):
-    return self.file_exists_at_key(model_version + '/sha.txt')
+    return self.file_exists_at_key("{}/sha.txt".format(model_version))
 
   def push_model(self, logger=None):
     # Check for all required files
     required_files = ['model.pkl', 'classes.pkl', 'train.log', 'cross_validate.log', 'scores.json', 'sha.txt']
     missing_files = []
     for required_file in required_files:
-      file_path = 'classifier/' + required_file
+      file_path = "classifier/{}".format(required_file)
       if not os.path.isfile(file_path):
         missing_files.append(required_file)
 
@@ -106,9 +106,9 @@ class DeployUtil(object):
     # Push files to s3
     model_version = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     for required_file in required_files:
-      file_path = 'classifier/' + required_file
+      file_path = "classifier/{}".format(required_file)
       key_obj = Key(self.bucket)
-      key_obj.key = model_version + "/" + required_file
+      key_obj.key = "{}/{}".format(model_version, required_file)
       key_obj.set_contents_from_filename(file_path)
       logger.log('Posted {} to S3.'.format(key_obj.key))
       os.remove(file_path)
